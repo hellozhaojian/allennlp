@@ -17,14 +17,13 @@ class OpenaiTransformerEmbedder(TokenEmbedder):
 
     Parameters
     ----------
-    transformer: ``OpenaiTransformer``, required.
+    transformer : ``OpenaiTransformer``, required.
         The ``OpenaiTransformer`` module used for the embeddings.
-    top_layer_only: ``bool``, optional (default = ``False``)
+    top_layer_only : ``bool``, optional (default = ``False``)
         If ``True``, then only return the top layer instead of apply the scalar mix.
     """
-    def __init__(self,
-                 transformer: OpenaiTransformer,
-                 top_layer_only: bool = False) -> None:
+
+    def __init__(self, transformer: OpenaiTransformer, top_layer_only: bool = False) -> None:
         super().__init__()
 
         self._transformer = transformer
@@ -42,10 +41,10 @@ class OpenaiTransformerEmbedder(TokenEmbedder):
         """
         Parameters
         ----------
-        inputs: ``torch.Tensor``, required
+        inputs : ``torch.Tensor``, required
             A ``(batch_size, num_timesteps)`` tensor representing the byte-pair encodings
             for the current batch.
-        offsets: ``torch.Tensor``, required
+        offsets : ``torch.Tensor``, required
             A ``(batch_size, max_sequence_length)`` tensor representing the word offsets
             for the current batch.
 
@@ -55,7 +54,7 @@ class OpenaiTransformerEmbedder(TokenEmbedder):
             An embedding representation of the input sequence
             having shape ``(batch_size, sequence_length, embedding_dim)``
         """
-        # pylint: disable=arguments-differ
+
         batch_size, num_timesteps = inputs.size()
 
         # the transformer embedding consists of the byte pair embeddings,
@@ -67,13 +66,15 @@ class OpenaiTransformerEmbedder(TokenEmbedder):
         vocab_size = self._transformer.vocab_size - self._transformer.n_ctx
 
         # vocab_size, vocab_size + 1, ...
-        positional_encodings = get_range_vector(num_timesteps, device=get_device_of(inputs)) + vocab_size
+        positional_encodings = (
+            get_range_vector(num_timesteps, device=get_device_of(inputs)) + vocab_size
+        )
 
         # Combine the inputs with positional encodings
-        batch_tensor = torch.stack([
-                inputs,   # (batch_size, num_timesteps)
-                positional_encodings.expand(batch_size, num_timesteps)
-        ], dim=-1)
+        batch_tensor = torch.stack(
+            [inputs, positional_encodings.expand(batch_size, num_timesteps)],
+            dim=-1,  # (batch_size, num_timesteps)
+        )
 
         byte_pairs_mask = inputs != 0
 

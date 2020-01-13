@@ -15,7 +15,7 @@ class LinearSimilarity(SimilarityFunction):
     combination of the two input vectors, followed by an (optional) activation function.  The
     combination used is configurable.
 
-    If the two vectors are ``x`` and ``y``, we allow the following kinds of combinations: ``x``,
+    If the two vectors are ``x`` and ``y``, we allow the following kinds of combinations : ``x``,
     ``y``, ``x*y``, ``x+y``, ``x-y``, ``x/y``, where each of those binary operations is performed
     elementwise.  You can list as many combinations as you want, comma separated.  For example, you
     might give ``x,y,x*y`` as the ``combination`` parameter to this class.  The computed similarity
@@ -42,17 +42,20 @@ class LinearSimilarity(SimilarityFunction):
         An activation function applied after the ``w^T * [x;y] + b`` calculation.  Default is no
         activation.
     """
-    def __init__(self,
-                 tensor_1_dim: int,
-                 tensor_2_dim: int,
-                 combination: str = 'x,y',
-                 activation: Activation = None) -> None:
-        super(LinearSimilarity, self).__init__()
+
+    def __init__(
+        self,
+        tensor_1_dim: int,
+        tensor_2_dim: int,
+        combination: str = "x,y",
+        activation: Activation = None,
+    ) -> None:
+        super().__init__()
         self._combination = combination
         combined_dim = util.get_combined_dim(combination, [tensor_1_dim, tensor_2_dim])
         self._weight_vector = Parameter(torch.Tensor(combined_dim))
         self._bias = Parameter(torch.Tensor(1))
-        self._activation = activation or Activation.by_name('linear')()
+        self._activation = activation or Activation.by_name("linear")()
         self.reset_parameters()
 
     def reset_parameters(self):

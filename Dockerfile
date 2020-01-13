@@ -1,4 +1,4 @@
-FROM python:3.6.8-stretch
+FROM python:3.6.10-stretch
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
@@ -30,19 +30,22 @@ RUN apt-get update --fix-missing && apt-get install -y \
     libxrender1 \
     wget \
     libevent-dev \
-    build-essential \
-    openjdk-8-jdk && \
+    build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy select files needed for installing requirements.
 # We only copy what we need here so small changes to the repository does not trigger re-installation of the requirements.
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY setup.py .
+COPY README.md .
+COPY allennlp/version.py allennlp/version.py
+RUN pip install -e .
+COPY dev-requirements.txt .
+RUN pip install -r dev-requirements.txt
 
 COPY scripts/ scripts/
 COPY allennlp/ allennlp/
 COPY pytest.ini pytest.ini
-COPY .pylintrc .pylintrc
+COPY .flake8 .flake8
 COPY tutorials/ tutorials/
 COPY training_config training_config/
 COPY setup.py setup.py
@@ -64,6 +67,9 @@ RUN ./scripts/cache_models.py
 # Optional argument to set an environment variable with the Git SHA
 ARG SOURCE_COMMIT
 ENV ALLENNLP_SOURCE_COMMIT $SOURCE_COMMIT
+
+# Copy wrapper script to allow beaker to run resumable training workloads.
+COPY scripts/ai2_internal/resumable_train.sh /stage/allennlp
 
 LABEL maintainer="allennlp-contact@allenai.org"
 

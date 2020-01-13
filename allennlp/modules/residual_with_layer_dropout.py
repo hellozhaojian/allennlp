@@ -11,19 +11,24 @@ class ResidualWithLayerDropout(torch.nn.Module):
     it will re-calibrate the outputs of this layer by the expected number of times it
     participates in training.
     """
+
     def __init__(self, undecayed_dropout_prob: float = 0.5) -> None:
         super().__init__()
         if undecayed_dropout_prob < 0 or undecayed_dropout_prob > 1:
-            raise ValueError(f"undecayed dropout probability has to be between 0 and 1, "
-                             f"but got {undecayed_dropout_prob}")
+            raise ValueError(
+                f"undecayed dropout probability has to be between 0 and 1, "
+                f"but got {undecayed_dropout_prob}"
+            )
         self.undecayed_dropout_prob = undecayed_dropout_prob
 
-    def forward(self,
-                layer_input: torch.Tensor,
-                layer_output: torch.Tensor,
-                layer_index: int = None,
-                total_layers: int = None) -> torch.Tensor:
-        # pylint: disable=arguments-differ
+    def forward(
+        self,  # type: ignore
+        layer_input: torch.Tensor,
+        layer_output: torch.Tensor,
+        layer_index: int = None,
+        total_layers: int = None,
+    ) -> torch.Tensor:
+
         """
         Apply dropout to this layer, for this whole mini-batch.
         dropout_prob = layer_index / total_layers * undecayed_dropout_prob if layer_idx and
@@ -43,7 +48,7 @@ class ResidualWithLayerDropout(torch.nn.Module):
 
         Returns
         -------
-        output: ``torch.FloatTensor``
+        output : ``torch.FloatTensor``
             A tensor with the same shape as `layer_input` and `layer_output`.
         """
         if layer_index is not None and total_layers is not None:

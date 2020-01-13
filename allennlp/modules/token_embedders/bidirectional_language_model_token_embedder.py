@@ -1,10 +1,12 @@
 from typing import Tuple
 
 from allennlp.modules.token_embedders.token_embedder import TokenEmbedder
-from allennlp.modules.token_embedders.language_model_token_embedder import LanguageModelTokenEmbedder
+from allennlp.modules.token_embedders.language_model_token_embedder import (
+    LanguageModelTokenEmbedder,
+)
 
 
-@TokenEmbedder.register('bidirectional_lm_token_embedder')
+@TokenEmbedder.register("bidirectional_lm_token_embedder")
 class BidirectionalLanguageModelTokenEmbedder(LanguageModelTokenEmbedder):
     """
     Compute a single layer of representations from a bidirectional language model. This is done
@@ -27,7 +29,7 @@ class BidirectionalLanguageModelTokenEmbedder(LanguageModelTokenEmbedder):
     bos_eos_tokens : ``Tuple[str, str]``, optional (default=``("<S>", "</S>")``)
         These will be indexed and placed around the indexed tokens. Necessary if the language model
         was trained with them, but they were injected external to an indexer.
-    remove_bos_eos: ``bool``, optional (default: True)
+    remove_bos_eos : ``bool``, optional (default: True)
         Typically the provided token indexes will be augmented with begin-sentence and end-sentence
         tokens. (Alternatively, you can pass bos_eos_tokens.) If this flag is True the
         corresponding embeddings will be removed from the return values.
@@ -36,14 +38,19 @@ class BidirectionalLanguageModelTokenEmbedder(LanguageModelTokenEmbedder):
     requires_grad : ``bool``, optional (default: False)
         If True, compute gradient of bidirectional language model parameters for fine tuning.
     """
-    def __init__(self,
-                 archive_file: str,
-                 dropout: float = None,
-                 bos_eos_tokens: Tuple[str, str] = ("<S>", "</S>"),
-                 remove_bos_eos: bool = True,
-                 requires_grad: bool = False) -> None:
-        super().__init__(archive_file=archive_file,
-                         dropout=dropout,
-                         bos_eos_tokens=bos_eos_tokens,
-                         remove_bos_eos=remove_bos_eos,
-                         requires_grad=requires_grad)
+
+    def __init__(
+        self,
+        archive_file: str,
+        dropout: float = None,
+        bos_eos_tokens: Tuple[str, str] = ("<S>", "</S>"),
+        remove_bos_eos: bool = True,
+        requires_grad: bool = False,
+    ) -> None:
+        super().__init__(
+            archive_file=archive_file,
+            dropout=dropout,
+            bos_eos_tokens=bos_eos_tokens,
+            remove_bos_eos=remove_bos_eos,
+            requires_grad=requires_grad,
+        )

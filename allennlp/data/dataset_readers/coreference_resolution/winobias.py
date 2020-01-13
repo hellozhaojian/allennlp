@@ -6,13 +6,20 @@ from overrides import overrides
 
 from allennlp.common.file_utils import cached_path
 from allennlp.data.dataset_readers.dataset_reader import DatasetReader
-from allennlp.data.fields import Field, ListField, TextField, SpanField, MetadataField, SequenceLabelField
+from allennlp.data.fields import (
+    Field,
+    ListField,
+    TextField,
+    SpanField,
+    MetadataField,
+    SequenceLabelField,
+)
 from allennlp.data.instance import Instance
 from allennlp.data.tokenizers import Token
 from allennlp.data.token_indexers import SingleIdTokenIndexer, TokenIndexer
-from allennlp.data.dataset_readers.dataset_utils import  enumerate_spans
+from allennlp.data.dataset_readers.dataset_utils import enumerate_spans
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+logger = logging.getLogger(__name__)
 
 
 @DatasetReader.register("winobias")
@@ -33,7 +40,7 @@ class WinobiasReader(DatasetReader):
     [The salesperson] sold (some books) to the librarian because [she] was trying to sell (them).
 
 
-    Returns a list of ``Instances`` which have four fields: ``text``, a ``TextField``
+    Returns a list of ``Instances`` which have four fields : ``text``, a ``TextField``
     containing the full sentence text, ``spans``, a ``ListField[SpanField]`` of inclusive start and
     end indices for span candidates, and ``metadata``, a ``MetadataField`` that stores the instance's
     original text. For data with gold cluster labels, we also include the original ``clusters``
@@ -42,16 +49,19 @@ class WinobiasReader(DatasetReader):
 
     Parameters
     ----------
-    max_span_width: ``int``, required.
+    max_span_width : ``int``, required.
         The maximum width of candidate spans to consider.
     token_indexers : ``Dict[str, TokenIndexer]``, optional
         This is used to index the words in the sentence.  See :class:`TokenIndexer`.
         Default is ``{"tokens": SingleIdTokenIndexer()}``.
     """
-    def __init__(self,
-                 max_span_width: int,
-                 token_indexers: Dict[str, TokenIndexer] = None,
-                 lazy: bool = False) -> None:
+
+    def __init__(
+        self,
+        max_span_width: int,
+        token_indexers: Dict[str, TokenIndexer] = None,
+        lazy: bool = False,
+    ) -> None:
         super().__init__(lazy)
         self._max_span_width = max_span_width
         self._token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
@@ -94,10 +104,12 @@ class WinobiasReader(DatasetReader):
             yield self.text_to_instance([Token(x) for x in words], [x for x in clusters.values()])
 
     @overrides
-    def text_to_instance(self,  # type: ignore
-                         sentence: List[Token],
-                         gold_clusters: Optional[List[List[Tuple[int, int]]]] = None) -> Instance:
-        # pylint: disable=arguments-differ
+    def text_to_instance(
+        self,  # type: ignore
+        sentence: List[Token],
+        gold_clusters: Optional[List[List[Tuple[int, int]]]] = None,
+    ) -> Instance:
+
         """
         Parameters
         ----------
@@ -149,9 +161,11 @@ class WinobiasReader(DatasetReader):
         span_field = ListField(spans)
         metadata_field = MetadataField(metadata)
 
-        fields: Dict[str, Field] = {"text": text_field,
-                                    "spans": span_field,
-                                    "metadata": metadata_field}
+        fields: Dict[str, Field] = {
+            "text": text_field,
+            "spans": span_field,
+            "metadata": metadata_field,
+        }
         if span_labels is not None:
             fields["span_labels"] = SequenceLabelField(span_labels, span_field)
 
